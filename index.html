@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Матвей Кочнев | Визитка</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#fafafa;
+      --text:#111;
+      --accent:#ff0066;
+      --card:#fff;
+      --shadow:0 12px 40px rgba(0,0,0,.08);
+      --code:#e94560;
+      --glare:rgba(255,255,255,.6);
+    }
+    [data-theme="dark"]{
+      --bg:#0e0e0e;
+      --text:#f1f1f1;
+      --accent:#ff4d94;
+      --card:#1a1a1a;
+      --shadow:0 12px 40px rgba(255,255,255,.06);
+      --code:#f98fa4;
+      --glare:rgba(255,255,255,.08);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',sans-serif}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);transition:background .4s,color .4s;overflow-x:hidden}
+    a{color:var(--accent);text-decoration:none}
+    header{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;background:var(--bg);box-shadow:var(--shadow);z-index:1000;backdrop-filter:blur(8px)}
+    nav a{margin-left:1.8rem;font-weight:600;position:relative}
+    nav a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:var(--accent);transition:.3s}
+    nav a:hover::after{width:100%}
+    .logo{display:flex;align-items:center;gap:.5rem;font-weight:900;font-size:1.1rem}
+    .logo img{width:32px;height:32px;border-radius:6px;image-rendering:crisp-edges}
+    .header-buttons{display:flex;align-items:center;gap:1rem;margin-left:auto}
+    .btn-tg{background:var(--accent);color:#fff;padding:.6rem 1.2rem;border-radius:24px;font-weight:600;font-size:.85rem;transition:.3s;box-shadow:0 4px 20px -5px var(--accent)}
+    .btn-tg:hover{transform:translateY(-2px) scale(1.05)}
+    .theme-switch{font-size:1.4rem;cursor:none;user-select:none;transition:transform .3s ease}
+    .theme-switch:hover{transform:rotate(180deg) scale(1.15)}
+    section{padding:7rem 2rem 4rem;max-width:960px;margin:auto}
+    h1,h2{font-weight:900;margin-bottom:1.2rem}
+    h1{font-size:clamp(2.2rem,5vw,3.2rem)}
+    h2{font-size:clamp(1.6rem,4vw,2.4rem);border-left:5px solid var(--accent);padding-left:1rem}
+    p{margin-bottom:1rem}
+    .card{background:var(--card);padding:2.2rem;border-radius:18px;box-shadow:var(--shadow);margin-top:2.5rem;opacity:0;transform:translateY(40px);transition:opacity 1.4s ease,transform 1.4s ease;position:relative;overflow:hidden}
+    .card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,var(--glare) 0%,transparent 60%);transform:rotate(30deg);transition:opacity .6s;opacity:0}
+    .card.show::before{opacity:1}
+    .card.show{opacity:1;transform:translateY(0)}
+    .brackets{position:fixed;font-family:'JetBrains Mono',monospace;font-size:8rem;color:var(--glare);user-select:none;z-index:-1;transition:transform .2s ease}
+    .brackets.left{top:10%;left:5%}
+    .brackets.right{bottom:10%;right:5%}
+    .lang-icons{position:fixed;display:flex;gap:2rem;font-size:4rem;opacity:.08;z-index:-1;transition:transform .2s ease}
+    .lang-icons.top{top:15%;left:10%}
+    .lang-icons.bottom{bottom:15%;right:10%}
+    .terminal{max-width:420px;margin:2rem auto;background:#1e1e1e;color:#50fa7b;border-radius:8px;padding:1rem;font-family:'JetBrains Mono',monospace;text-align:left;box-shadow:0 0 20px rgba(0,0,0,.4)}
+    .terminal .prompt{color:#f98fa4}
+    .cursor{display:inline-block;width:10px;height:18px;background:#50fa7b;animation:blink 1s infinite}
+    @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+    #progressBar{position:fixed;top:0;left:0;height:4px;background:var(--accent);z-index:2000;transition:width .2s}
+    footer{text-align:center;padding:2.5rem 1rem;font-size:.9rem;opacity:.6;position:relative}
+
+    /* СТАДИИ */
+    .stage{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:2rem}
+    .icon-card{width:320px;height:320px;background:var(--card);border-radius:24px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;font-size:6rem;opacity:0;transform:scale(.8);transition:opacity 1.2s ease,transform 1.2s ease}
+    .icon-card.show{opacity:1;transform:scale(1)}
+    .stage-text{width:320px;margin-top:1.5rem;font-size:1.1rem;text-align:center;opacity:0;transform:translateY(20px);transition:opacity 1s ease .4s,transform 1s ease .4s}
+    .stage-text.show{opacity:1;transform:translateY(0)}
+    #finalPage{display:none;opacity:0;transition:opacity 1s ease}
+    #finalPage.show{display:block;opacity:1}
+
+    /* размытый след за курсором */
+    .cursor-trail{position:fixed;width:40px;height:40px;border-radius:50%;background:var(--accent);opacity:.25;filter:blur(12px);pointer-events:none;z-index:9999;transition:transform .1s ease}
+    @media(max-width:600px){header{flex-direction:column;align-items:flex-start;padding:1rem}nav a{margin:.3rem .6rem 0 0}.header-buttons{margin-left:0;margin-top:.5rem}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <img src="https://www.tpu.ru/favicon.ico" alt="ТПУ">
+    <span>ИШИТР</span>
+  </div>
+  <nav>
+    <a href="#about">О себе</a>
+    <a href="#letter">Мотивационное письмо</a>
+  </nav>
+  <div class="header-buttons">
+    <a class="btn-tg" href="https://t.me/kryyotaa" target="_blank">Написать мне</a>
+    <div class="theme-switch" id="toggleTheme" title="Переключить тему">🌓</div>
+  </div>
+</header>
+
+<div class="cursor-trail"></div>
+<div id="progressBar"></div>
+
+<span class="brackets left">{</span>
+<span class="brackets right">}</span>
+
+<div class="lang-icons top">
+  <span>🐍</span><span>☕</span><span>🚀</span><span>💻</span><span>🔧</span>
+</div>
+<div class="lang-icons bottom">
+  <span>🐳</span><span>⚛️</span><span>📦</span><span>🌐</span><span>📊</span>
+</div>
+
+<!-- ==========  СТАДИЯ 1 : иконка «о себе»  ========== -->
+<section class="stage" id="stage1">
+  <div class="icon-card" id="iconAbout">👨‍💻</div>
+  <div class="stage-text" id="textAbout"></div>
+</section>
+
+<!-- ==========  СТАДИЯ 2 : иконка «мотивация»  ========== -->
+<section class="stage" id="stage2">
+  <div class="icon-card" id="iconMotiv">🚀</div>
+  <div class="stage-text" id="textMotiv"></div>
+</section>
+
+<!-- ==========  ФИНАЛЬНАЯ СТРАНИЦА  ========== -->
+<div id="finalPage">
+  <section id="about">
+    <h1>О себе</h1>
+    <div class="card">
+      <p>Привет! Я — студент ТПУ, направление «Информатика и вычислительная техника». Планирую перевестись на «Программную инженерию», чтобы создавать устойчивые и полезные продукты.</p>
+      <p>Мои сильные стороны: амбициозность, постоянное желание учиться и искренняя вовлечённость в то, что делаю.</p>
+    </div>
+  </section>
+
+  <section id="letter">
+    <h2>Мотивационное письмо</h2>
+    <div class="card">
+      <p id="finalMotivText"></p>
+      <p>В будущем вижу себя backend-разработчиком в одной из сфер: финтех, мобильные платформы или высоконагруженные системы.</p>
+    </div>
+  </section>
+
+  <div class="terminal">
+    <div><span class="prompt">$</span> cd /top-it</div>
+    <div><span class="prompt">$</span> ./apply.sh<span class="cursor"></span></div>
+  </div>
+
+  <footer>© <span id="year"></span> Матвей Кочнев</footer>
+</div>
+
+<script>
+  /* прогресс-бар */
+  const bar=document.getElementById('progressBar');
+  window.addEventListener('scroll',()=> bar.style.width=(window.scrollY/(document.body.scrollHeight-window.innerHeight))*100+'%');
+
+  /* печать текста */
+  const aboutTxt=`Привет! Я — студент ТПУ, направление «Информатика и вычислительная техника». Планирую перевестись на «Программную инженерию», чтобы создавать устойчивые и полезные продукты.`;
+  const motivTxt=`На программу ТОП-ИТ должны взять именно меня именно потому что я готов трудностям, к постоянному обучению, к совершению ошибок и их исправлению. Я готовился к ЕГЭ по информатике полностью самостоятельно и сдал на 83 балла, что показывает мой навык самостоятельного обучения. Я вижу в этом огромную возможность к развитию и очень хочу попасть в ТОП - ИТ.`;
+
+  let aboutPrinted = false;
+  let motivPrinted = false;
+
+  function typeWriter(el,text,speed,flag){
+    if(flag) return;
+    let i=0;
+    function t(){
+      if(i<text.length){el.textContent+=text.charAt(i);i++;setTimeout(t,speed);}
+    }
+    t();
+  }
+
+  /* появление иконок + текст */
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        const card=entry.target.querySelector('.icon-card');
+        const txtEl=entry.target.querySelector('.stage-text');
+        card.classList.add('show');
+        setTimeout(()=>txtEl.classList.add('show'),300);
+        if(entry.target.id==='stage1'){
+          typeWriter(txtEl,aboutTxt,30,aboutPrinted);
+          aboutPrinted = true;
+        }
+        if(entry.target.id==='stage2'){
+          typeWriter(txtEl,motivTxt,30,motivPrinted);
+          motivPrinted = true;
+        }
+      }
+    });
+  },{threshold:.6});
+
+  io.observe(document.getElementById('stage1'));
+  io.observe(document.getElementById('stage2'));
+
+  /* финальная страница */
+  const finalIO=new IntersectionObserver((e)=>{
+    if(e[0].isIntersecting){
+      const final=document.getElementById('finalPage');
+      document.getElementById('finalMotivText').textContent=motivTxt;
+      final.style.display='block';
+      setTimeout(()=>final.classList.add('show'),100);
+      finalIO.disconnect();
+    }
+  },{threshold:.1});
+  finalIO.observe(document.querySelector('footer'));
+
+  /* размытый след за курсором */
+  const trail=document.querySelector('.cursor-trail');
+  document.addEventListener('mousemove',(e)=>{
+    trail.style.left=e.clientX-20+'px';
+    trail.style.top=e.clientY-20+'px';
+  });
+
+  /* динамика за курсором */
+  document.addEventListener('mousemove',(e)=>{
+    const x=(e.clientX/window.innerWidth-0.5)*20;
+    const y=(e.clientY/window.innerHeight-0.5)*20;
+    document.querySelector('.brackets.left').style.transform=`translate(${x}px,${y}px)`;
+    document.querySelector('.brackets.right').style.transform=`translate(${-x}px,${-y}px)`;
+    document.querySelector('.lang-icons.top').style.transform=`translate(${-x}px,${-y}px)`;
+    document.querySelector('.lang-icons.bottom').style.transform=`translate(${x}px,${y}px)`;
+  });
+
+  /* приближение иконок при наведении */
+  document.querySelectorAll('.icon-card').forEach(ic=>{
+    ic.addEventListener('mouseenter',()=>{
+      ic.style.transform='scale(1.3)';
+      ic.style.transition='transform .3s ease';
+    });
+    ic.addEventListener('mouseleave',()=>{
+      ic.style.transform='scale(1)';
+    });
+  });
+
+  /* магнит кнопок */
+  document.querySelectorAll('.btn-tg').forEach(b=>{
+    b.addEventListener('mousemove',e=>{
+      const r=b.getBoundingClientRect();
+      const x=e.clientX-r.left-r.width/2;
+      const y=e.clientY-r.top-r.height/2;
+      b.style.transform=`translate(${x/8}px,${y/8}px)`;
+    });
+    b.addEventListener('mouseleave',()=>b.style.transform='');
+  });
+
+  /* переключатель темы */
+  const toggleBtn=document.getElementById('toggleTheme');
+  const saved=localStorage.getItem('theme');
+  if(saved==='dark')document.documentElement.setAttribute('data-theme','dark');
+  toggleBtn.addEventListener('click',()=>{
+    const current=document.documentElement.getAttribute('data-theme');
+    const next=current==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',next);
+    localStorage.setItem('theme',next);
+  });
+
+  /* год в футере */
+  document.getElementById('year').textContent=new Date().getFullYear();
+</script>
+</body>
+</html>
